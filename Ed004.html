@@ -1,0 +1,397 @@
+<html>
+<head>
+	<title>N/A</title>
+	<meta charset="iso-8859-1"/>
+	<meta http-equiv="content-type" content="text/html"/>
+	<meta name="author" content="Bernardo Meyer">
+	<meta name="description" content="Criando os estilos para o interior do IFRAME">
+	<meta name="keywords" content="sites, web, desenvolvimento, jscript, javascript">
+	<style>
+		BODY.frame {
+			font-family: Verdana; 
+			font-size: 28px;
+			}	
+		BODY {
+			font-family: Verdana; 
+			font-size: 18px;
+			}
+		B.frame {color:#1C1C1C;}
+		BUTTON {
+			background: darkgreen;
+			border: solid 1px green;
+			border-radius: 6px;
+			color:white;
+			height: 33px; 
+			margin-top: 3px;margin-bottom: 3px;
+			vertical-align: top;
+			width: 35px;
+			}
+		BUTTON.action {border: solid 2px turquoise;width: 60px;}
+		BUTTON.big {font-size: 18px;height: 32px;}
+		BUTTON.largo {font-size: 18px;height: 32px;width:48px;}
+		DIV#geral {display: table-row;background: #363636;}
+		DIV#geral DIV {display: table-cell; position:relative;float: left;}
+		DIV#painel {background: lightgrey;margin: 6px;}
+		DIV#tela {padding-top: 30px;}
+		DIV#tools {
+			background-color: lightcyan;
+			border: solid 1px powderblue;
+			border-radius: 6px;
+			color: teal;
+			display: none;
+			left: 350px;
+			position: absolute;
+			top: -500px;
+			width: 500px;			
+			}
+		DIV#tools  TABLE {
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			}
+		DIV#tools  TABLE  CAPTION{
+			color: darkcyan;
+			font-size: 24px;
+			font-weight: bold;
+			}				
+		H1 {color: DarkOliveGreen; text-shadow: 1px 1px gray;}
+		IFRAME {
+			background: lightgrey;
+			float: left;
+			margin-top: 2px;
+			}
+		INPUT {width: 40px; color: DarkOliveGreen;}
+		INPUT.cor {margin-top: 6px;}
+		LABEL { color: darkgreen; }
+		TEXTAREA {
+			font-family: Verdana; 
+			font-size: 28px;
+			}
+	</style>
+	<link rel="shortcut icon" href="favicon.ico" />
+	<script>
+		var ESTILOS = "";
+		function fillTitle(){
+			// Descrição da página - document.head
+			var descri = document.head.querySelector("meta[name=description]");
+			getTag("titulo").innerText = descri.content;
+			// Nome da script - window.location - split
+			var path = window. location. pathname;
+			var arrPath = path. split("/");
+			var page = arrPath. pop();
+			document.title = page;			
+			}
+		function getTag(nomeId){
+			return document.getElementById(nomeId);
+			}
+		function mostra(nomeId){
+			getTag(nomeId).style.display = "block";
+			}
+		function esconde(nomeId){
+			event.stopPropagation();
+			getTag(nomeId).style.display = "none";
+			}
+		function clicDiv(valor){
+			event.stopPropagation();
+			var retang = valor;
+			var aviso = getTag("aviso");
+			aviso.innerText = "Retângulo "+retang;
+			mostra("quadro");
+			return; 
+			}
+		function clickBody(evt){
+			alert('Você clicou na página do navegador.');
+			}
+		function getSele(){
+			var el = getTag("area1");
+			var el_ini = el.selectionStart;
+			var el_fim = el.selectionEnd;
+			console.log("selecionou de "+el_ini+" até "+el_fim);
+			el.setSelectionRange(el_ini, el_fim);
+			console.log((el.value).substr(el_ini,el_fim-el_ini));
+			getTag("ini").value = el_ini;
+			getTag("fim").value = el_fim;
+			return;
+			};			
+		function cerca(pTag){
+
+			var texto = getTag("area1").value;
+			var tam = texto.length;
+			var ini = parseInt(getTag("ini").value);
+			var fim = parseInt(getTag("fim").value);
+			// CORREÇÃO DO FIM, caso o usuário selecione além do fim
+			if( fim > tam - 1){
+				fim = tam - 1;
+				}
+			getTag("tam").value = tam;
+			var newTexto = "";
+			newTexto = newTexto.concat(texto.substr(0,ini));
+			if( pTag == "cor" ){
+				newTexto = newTexto.concat("<font color="+ getTag("paleta").value +">");
+				pTag = "font";
+				} else {
+				newTexto = newTexto.concat("<"+pTag+">");
+				}
+			newTexto = newTexto.concat(texto.substr(ini,fim-ini));
+			newTexto = newTexto.concat("</"+pTag+">");
+			newTexto = newTexto.concat(texto.substr(fim,tam-fim-1));
+			getTag("area1").value = newTexto;
+			// Atualiza IFrame
+			docFrame(getTag("area1"));
+			}
+		function injectStyleSheet(){
+			// Folha CSS
+			 let sty = document.createElement("style");
+			sty.innerText = ESTILOS;
+			var headIframe = getTag("frame1").contentDocument.head;
+			// Se os estilos não tiverem sido transferidos, injeta no IFRAME
+			if( headIframe.innerText == "" ){
+				headIframe.appendChild(sty);
+				}
+
+			}
+		function frameRefresh(obj){
+			setTimeout(function(){
+				var txtHtm = obj.value;
+				var f = getTag("frame1");
+				var d = f.contentDocument;
+				var b = d.body;
+				b.innerHTML = txtHtm;
+				f.focus();
+				}, 1500);
+			}
+		function docFrame(obj){
+			// Folha CSS
+			injectStyleSheet();
+			//getTag("frame1").contentDocument.head.appendChild(sty);
+			// Conteudo
+			frameRefresh(obj);
+			}
+		// CUIDADO: estilo é o formato sem traço ("-")
+		// Configura o estilo de uma TAG/Seletor de TAG
+		function setTagStyle(obj, estilo, valor){
+			var cmd = "document.querySelector('"+obj+"').style."+estilo+" = "+valor;
+			eval(cmd);
+			return; 
+			}
+		// Exibe o menu de contexto geral na posição do clique do mouse
+		function contexto(e){
+			console.log("Contexto");
+			var source = e.target || e.srcElement;
+			console.log(source);
+			mostra("tools");
+			setTagStyle("DIV#tools", "top", e.clientY);
+			setTagStyle("DIV#tools", "left", e.screenX);
+			e.preventDefault();
+			e.stopPropagation();
+			}
+		/*
+			Função executada no ONLOAD da página
+		*/
+		function init(){
+			fillTitle();
+			ESTILOS = document.querySelector("style");
+			var S = "";
+			var Regra = "";
+			var TAG = "";
+			var colecao = ESTILOS.sheet.rules;
+			var arr = null;
+			var arrFmt = null;
+			for( item in colecao ) {
+				if( colecao[item].cssText ){
+					Regra = colecao[item].cssText;
+					arr = Regra.split(".");
+					TAG = arr[0];
+					if( arr[1] ){
+						arrFmt = arr[1].split("{");
+						arr = arr[1].split(" ");
+						if( arr[0].substr(0,5) == "frame" ){
+							Regra = TAG + " {" + arrFmt[1];
+							S +=Regra + " ";
+							}
+						}
+					}
+				};
+			ESTILOS = S;
+			}
+		function styleTag(){
+			var INI = parseInt(getTag("ini").value);
+			var FIM = parseInt(getTag("fim").value);
+			FIM--;
+			var texto = getTag("area1").value;
+			var Soma = ( texto.substr(INI,1) == "<" ) + ( texto.substr(FIM,1) == ">" );
+			if( !(Soma == 2 &&  texto.substr(INI+1,1) != "/") ) {
+				alert("Selecione corretamente uma tag, do sinal '<' até o '>' ");
+				return;
+				}
+			var texto = getTag("area1").value;
+			var TAM = texto.length;
+			var pTag = texto.substr(INI+1,FIM-INI-1);
+			var arr = pTag.split(" ");
+			pTag = arr[0];
+			// Faz a substituição
+			var newTexto = "";
+			newTexto = newTexto.concat(texto.substr(0,INI));
+			//newTexto = newTexto.concat(texto.substr(INI,FIM-INI-2));
+			newTexto = newTexto.concat("<"+pTag+ " style=\"");
+			if( getTag("alin").value != "N/A" ){
+				newTexto = newTexto.concat("text-align: "+getTag("alin").value+";");
+				}
+			if( getTag("tamft").value != "N/A" ){
+				newTexto = newTexto.concat("font-size: "+getTag("tamft").value+";");
+				}
+			if( getTag("ftFam").value != "N/A" ){
+				newTexto = newTexto.concat("font-family: "+getTag("ftFam").value+";");
+				}
+			if( getTag("altLinha").value != "N/A" ){
+				newTexto = newTexto.concat("line-height: "+getTag("altLinha").value+";");
+				}
+			newTexto = newTexto.concat("\">");
+			// newTexto = newTexto.concat("</"+pTag+">");
+			newTexto = newTexto.concat(texto.substr(FIM+1,TAM-FIM-1));
+			getTag("area1").value = newTexto;
+			// Conteudo
+			frameRefresh(getTag("area1"));			
+			}
+		function saveFile(){  
+			// get the textbox data...
+			textToWrite = escape_iso_8859(document.getElementById("frame1").contentDocument.body.innerHTML);
+			// put the data in a Blob object...
+			var textFileAsBlob = new Blob([textToWrite], {type:'text/html;charset=ISO-8859-1'});
+			// create a hyperlink <a> element tag that will be automatically clicked below...
+			var downloadLink = document.createElement("a");
+			// set the file name...
+			downloadLink.download = "Nome.html";
+			// set the <a> tag href as a URL to point to the Blob
+			downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+			// automaitcally click the <a> element to go to the URL to save the textFileAsBlob...
+			downloadLink.click();
+		}
+		function escape_iso_8859(s) {  
+				if( typeof s == 'number'){ return s; }
+				s = s.replace(/á/g, '&aacute;');
+				s = s.replace(/é/g, '&eacute;');
+				s = s.replace(/ó/g, '&oacute;');
+				s = s.replace(/í/g, '&iacute;');
+				s = s.replace(/ú/g, '&uacute;');
+				s = s.replace(/ê/g, '&ecirc;');
+				s = s.replace(/ô/g, '&ocirc;');
+				s = s.replace(/ã/g, '&atilde;');
+				s = s.replace(/õ/g, '&otilde;');
+				s = s.replace(/Á/g, '&Aacute;');
+				s = s.replace(/É/g, '&Eacute;');
+				s = s.replace(/Ó/g, '&Oacute;');
+				s = s.replace(/Í/g, '&Iacute;');
+				s = s.replace(/Ú/g, '&Uacute;');
+				s = s.replace(/Ê/g, '&Ecirc;');
+				s = s.replace(/Ô/g, '&Ocirc;');
+				s = s.replace(/Ã/g, '&Atilde;');
+				s = s.replace(/Õ/g, '&Otilde;');
+				return s;
+				}
+	</script>
+</head>
+<body id="corpo" onload="init();">
+	<h1 id="titulo">&nbsp;</h1>
+	<div id="geral">
+		<div id="main">
+			<nav style="float: clear;">
+				<button onclick="cerca('h1');">H1</button>
+				<button onclick="cerca('h2');">H2</button>
+				<button onclick="cerca('h3');">H3</button>
+				<button class=big onclick="cerca('i');">I</button>
+				<button class=big onclick="cerca('b');">N</button>
+				<button onclick="cerca('div');">DIV</button>
+				<button class=big onclick="cerca('p');">P</button>
+				<button onclick="cerca('cor');">Cor</button>
+				<input class="cor" type=color id=paleta>
+				<button onclick="frameRefresh(getTag('area1'));">&#9654;</button>
+				<button class="largo" onclick="saveFile();"><img width="28" src="img/Save.jpg"></button>
+			</nav>
+			<textarea id="area1" cols=45 rows=11 oncontextmenu="contexto(event);" onselect="getSele();" onchange="docFrame(this);" onpaste="frameRefresh(this);">
+			
+			</textarea><br>
+			<div id="painel">
+				<label>Seleção: </label><input id="ini" size=4>&rarr;<input id="fim" size=4>
+				<label>Tamanho:</label><input id="tam" size=4>
+			</div>
+		</div>
+		<div id="tela"><iframe id="frame1" height="374px" width="700px"></iframe></div>
+	</div>
+	<div id="tools">
+		<table>
+			<caption>FUNÇÕES DE ESTILO</caption><img src="img/Close.jpg" align="right" onclick="esconde('tools')"><br>
+			<tbody>
+				<tr>
+					<td><label>Alinh.Texto: </label></td>
+					<td>
+						<select id="alin">
+							<option value="N/A">[Escolha]
+							<option value="left">Esquerda
+							<option value="center">Centro
+							<option value="right">Direita
+							<option value="justify">Justificado
+						</select>
+					</td>
+					<td>
+						<label>Tam.Fonte: </label>
+					</td>
+					<td>
+						<select id="tamft">
+							<option value="N/A">[Escolha]
+							<option value="12px">12
+							<option value="14px">14
+							<option value="16px">16
+							<option value="18px">18
+							<option value="20px">20
+							<option value="22px">22
+							<option value="24px">24
+							<option value="26px">26
+							<option value="28px">28
+							<option value="32px">32
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td><label>Tipo Fonte: </label></td>
+					<td>
+						<select id="ftFam">
+							<option value="N/A">[Escolha]
+							<option value="Arial">Arial
+							<option value="Franklin Gothic Medium">Frank.Got.Medium
+							<option value="Helvetica">Helvetica
+							<option value="Lucida Sans">Lucida Sans
+							<option value="Trebuchet MS">Trebuchet
+							<option value="Verdana">Verdana
+						</select>
+					</td>
+					<td>
+						<label>Entrelinha: </label>
+					</td>
+					<td>
+						<select id="altLinha">
+							<option value="N/A">[Escolha]
+							<option value="110%">110%
+							<option value="120%">120%
+							<option value="130%">130%
+							<option value="140%">140%
+							<option value="150%">150%
+							<option value="160%">160%
+							<option value="170%">170%
+							<option value="180%">180%
+							<option value="190%">190%
+							<option value="200%">200%
+						</select>
+					</td>
+				</tr>				
+				<tr>
+					<td colspan=4>&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan=4 align=center><button class=action onclick="styleTag();">Estiliza</button></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
